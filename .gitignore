@@ -127,3 +127,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+V1/Images/cvIcon.ico
+V1/Images/cvIcon.png
+V1/Images/cvIcon2.ico

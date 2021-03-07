@@ -2,7 +2,7 @@ import bs4
 import re
 from urllib.request import urlopen as uReq
 from bs4 import BeautifulSoup as soup
-#test
+
 #CHANGE this url to the location of the html form file saved for this specific project
 my_url = input("Please paste the LOCAL URL of the .html file of project form: ")
 cv_pid = input("Please type in the CV project ID (I.e., T001): ")

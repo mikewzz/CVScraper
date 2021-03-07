@@ -4,12 +4,12 @@ from urllib.request import urlopen as uReq
 from bs4 import BeautifulSoup as soup
 
 #CHANGE this url to the location of the html form file saved for this specific project
-my_url = input("Please paste the LOCAL URL of the .html file of project form: ")
-cv_pid = input("Please type in the CV project ID (I.e., T001): ")
+#my_url = input("Please paste the LOCAL URL of the .html file of project form: ")
+#cv_pid = input("Please type in the CV project ID (I.e., T001): ")
 #FOR TESTING UNCOMMENT CODE BELOW TO MANUALLY INSERT URL
-#my_url = "file:///C:/Users/mikew/Programming/WebScraper/The%20Market%20Tester%E2%84%A2%20Results%20Upload%20%E2%80%93%20Enabling%20Ideas.html"
+my_url = "file:///C:/Users/mikew/Programming/WebScraper/The%20Market%20Tester%E2%84%A2%20Results%20Upload%20%E2%80%93%20Enabling%20Ideas.html"
 #CHANGE THIS TO PROJECT NUMBER IN QUOTATIONS (I.e., "T001")
-#cv_pid = "T001"
+cv_pid = "T001"
 
 
 uClient = uReq(my_url)
@@ -20,6 +20,7 @@ page_soup = soup(page_html, "html.parser")
 
 fileName = "DecipherCodeToCopy.txt"
 f= open(fileName,"w")
+excelName = "ConceptHighlighters.csv"
 
 #Panel Size
 pSize_temp = page_soup.find("tr",{"id":"gv-field-21-41"})
@@ -57,6 +58,7 @@ for eachCellLabel in range(numCells):
     f.write("p.cellName" + str(eachCellLabel+1) + " = " + '"' + cellNameList[eachCellLabel] + '"' +"\n")
     f.write("p.cellIMG" + str(eachCellLabel+1) + " = " + '"' + cv_pid + "_Cell_" + str(eachCellLabel+1) + '"' +"\n")
 
+
 #Type of material used for this study
 materialType_temp = page_soup.find("tr",{"id":"gv-field-21-75"})
 if materialType_temp is not None:
@@ -67,6 +69,24 @@ if materialType_temp is not None:
         f.write("MATERIAL_TYPE.val = 1" +"\n")      
 else:
     f.write("MATERIAL_TYPE.val = 2" +"\n")
+
+
+#Cell TEXT IF Material Type is "text" based
+if materialType_temp is not None and (str(materialType_temp.td.text) == "text"):
+    e= open(excelName,"w")
+    cellText = []
+    cellTextFieldIDs = [74,76,77,78,79,80,81,82]
+    for count,eachCellTextIndex in enumerate(cellTextFieldIDs):
+        if count < numCells:
+            e.write("<define label=\"Con" + str(count+1) +"\" builder:title=\"Concept" + str(count+1) + "\">" +"\n")
+            tempFullConcept = (page_soup.find("tr",{"id":"gv-field-21-" + str(eachCellTextIndex)}).td.text)
+            listFullConcept = tempFullConcept.split()
+            for wordIndex,eachWord in enumerate(listFullConcept):
+                e.write("<row label=\"r" + str(wordIndex + 1) + "\" hottext:disable=\"0\" translateable=\"0\">" + str(eachWord) + "</row>" +"\n")
+            e.write("</define>" +"\n\n")
+#IF Material Type is "image" based; save images locally
+elif materialType_temp is not None and (str(materialType_temp.td.text) == "image"):
+    print ("PLACEHOLDER")
 
 #Country Filter
 countryChk_temp = page_soup.find("tr",{"id":"gv-field-21-39"})
