@@ -1,5 +1,8 @@
 import bs4
 import re
+import os
+import requests
+import urllib.parse
 from urllib.request import urlopen as uReq
 from bs4 import BeautifulSoup as soup
 
@@ -7,7 +10,7 @@ from bs4 import BeautifulSoup as soup
 #my_url = input("Please paste the LOCAL URL of the .html file of project form: ")
 #cv_pid = input("Please type in the CV project ID (I.e., T001): ")
 #FOR TESTING UNCOMMENT CODE BELOW TO MANUALLY INSERT URL
-my_url = "file:///C:/Users/mikew/Programming/WebScraper/The%20Market%20Tester%E2%84%A2%20Results%20Upload%20%E2%80%93%20Enabling%20Ideas.html"
+my_url = "file:///C:/Users/mikew/Programming/WebScraper/The%20Market%20Tester%E2%84%A2%20Results%20Upload%20%E2%80%93%20Enabling%20Ideas_1481.html"
 #CHANGE THIS TO PROJECT NUMBER IN QUOTATIONS (I.e., "T001")
 cv_pid = "T001"
 
@@ -71,7 +74,7 @@ else:
     f.write("MATERIAL_TYPE.val = 2" +"\n")
 
 
-#Cell TEXT IF Material Type is "text" based
+#IF Material Type is "text" based; saves text as highlighter excel files
 if materialType_temp is not None and (str(materialType_temp.td.text) == "text"):
     e= open(excelName,"w")
     cellText = []
@@ -86,7 +89,20 @@ if materialType_temp is not None and (str(materialType_temp.td.text) == "text"):
             e.write("</define>" +"\n\n")
 #IF Material Type is "image" based; save images locally
 elif materialType_temp is not None and (str(materialType_temp.td.text) == "image"):
-    print ("PLACEHOLDER")
+    print("SAVE IMAGES LOCALLY")
+    imagePaths=[]
+    for count,eachImageIndex in enumerate(range(84,92)):
+        if count < numCells:
+            imageList = (os.path.abspath(page_soup.find("tr",{"id":"gv-field-21-" + str(eachImageIndex)}).td.img['src']))
+            
+            #imageList = imageList.encode()
+            imageList = urllib.parse.quote("file://" + imageList, safe='\\')
+            #imageList = imageList.replace(" ","%20")
+            print (imageList)
+            #with open(cv_pid + "_Cell_" + str(count+1) + ".jpg", 'wb') as i:
+                #im = requests.get(imageList)
+                #i.write(im.content)
+            #urllib.request.urlretrieve(imageList, cv_pid + "_Cell_" + str(count+1) + ".jpg")
 
 #Country Filter
 countryChk_temp = page_soup.find("tr",{"id":"gv-field-21-39"})
