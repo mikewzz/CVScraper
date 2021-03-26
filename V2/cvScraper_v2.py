@@ -7,12 +7,12 @@ from urllib.request import urlopen as uReq
 from bs4 import BeautifulSoup as soup
 
 #CHANGE this url to the location of the html form file saved for this specific project
-#my_url = input("Please paste the LOCAL URL of the .html file of project form: ")
-#cv_pid = input("Please type in the CV project ID (I.e., T001): ")
+my_url = input("Please paste the LOCAL URL of the .html file of project form: ")
+cv_pid = input("Please type in the CV project ID (I.e., T001): ")
 #FOR TESTING UNCOMMENT CODE BELOW TO MANUALLY INSERT URL
-my_url = "file:///C:/Users/mikew/Programming/WebScraper/The%20Market%20Tester%E2%84%A2%20Results%20Upload%20%E2%80%93%20Enabling%20Ideas_1481.html"
+#my_url = "file:///C:/Users/Windows/Desktop/GitHub%20Repos/pythonTest/CV%20Scraper/The%20Market%20Tester%E2%84%A2%20Results%20Upload%20%E2%80%93%20Enabling%20Ideas.html"
 #CHANGE THIS TO PROJECT NUMBER IN QUOTATIONS (I.e., "T001")
-cv_pid = "T001"
+#cv_pid = "T001"
 
 
 uClient = uReq(my_url)
@@ -183,7 +183,7 @@ if income_temp is not None:
     incFilter = (income_temp.td.text)
     if incFilter == "99k or less":
         f.write("INCOME_FLAG.val = 0" +"\n")
-    elif incFilter == "100k or moree":
+    elif incFilter == "100k or more":
         f.write("INCOME_FLAG.val = 1" +"\n")
 else:
     f.write("INCOME_FLAG.val = 2" +"\n")
