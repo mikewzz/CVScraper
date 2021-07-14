@@ -7,12 +7,12 @@ from urllib.request import urlopen as uReq
 from bs4 import BeautifulSoup as soup
 
 #CHANGE this url to the location of the html form file saved for this specific project
-my_url = input("Please paste the LOCAL URL of the .html file of project form: ")
-cv_pid = input("Please type in the CV project ID (I.e., T001): ")
+#my_url = input("Please paste the LOCAL URL of the .html file of project form: ")
+#cv_pid = input("Please type in the CV project ID (I.e., T001): ")
 #FOR TESTING UNCOMMENT CODE BELOW TO MANUALLY INSERT URL
-#my_url = "file:///C:/Users/Windows/Desktop/GitHub%20Repos/pythonTest/CV%20Scraper/The%20Market%20Tester%E2%84%A2%20Results%20Upload%20%E2%80%93%20Enabling%20Ideas.html"
+my_url = "file:///C:/Users/Windows/Desktop/GitHub%20Repos/CVScraper/Offline%20Test%20%231/The%20Market%20Tester%E2%84%A2%20Results%20Upload%20%E2%80%93%20Enabling%20Ideas.html"
 #CHANGE THIS TO PROJECT NUMBER IN QUOTATIONS (I.e., "T001")
-#cv_pid = "T001"
+cv_pid = "T001_OT1"
 
 
 uClient = uReq(my_url)
@@ -205,25 +205,58 @@ if q6Txt_temp is not None:
     q6Txt = list(filter(bool, q6Txt.splitlines()))
     #print((q6Txt))
     #print((q6Txt[2]))
+    #print (q6Txt[0])
+    #this condition accounts for if client wants all cells to use the same price/unit and only provided one set despite multiple cells
+    if (len(q6Txt) > 2):
+        for eachQ6Label in range(numCells*2):
+            if eachQ6Label %2 == 0:
+                #print(eachQ6Label)
+                f.write("p.cellPrice" + str((eachQ6Label+2) // 2) + " = " + '"$' + q6Txt[eachQ6Label] + '"' +"\n")
+            elif eachQ6Label %2 == 1:
+                #print(eachQ6Label)
+                f.write("p.cellAmt" + str((eachQ6Label+1) // 2) + " = " + '"' + q6Txt[eachQ6Label] + '"' +"\n")
+    elif (len(q6Txt) == 2):
+        for eachQ6Label in range(numCells*2):
+            if eachQ6Label %2 == 0:
+                #print(eachQ6Label)
+                f.write("p.cellPrice" + str((eachQ6Label+2) // 2) + " = " + '"$' + q6Txt[0] + '"' +"\n")
+            elif eachQ6Label %2 == 1:
+                #print(eachQ6Label)
+                f.write("p.cellAmt" + str((eachQ6Label+1) // 2) + " = " + '"' + q6Txt[1] + '"' +"\n")        
+else:
+    f.write("p.q6ask = \"0\"" + "\n")
     for eachQ6Label in range(numCells*2):
         if eachQ6Label %2 == 0:
             #print(eachQ6Label)
-            f.write("p.cellPrice" + str((eachQ6Label+2) // 2) + " = " + '"$' + q6Txt[eachQ6Label] + '"' +"\n")
+            f.write("p.cellPrice" + str((eachQ6Label+2) // 2) + " = \"0\" " + "\n")
         elif eachQ6Label %2 == 1:
             #print(eachQ6Label)
-            f.write("p.cellAmt" + str((eachQ6Label+1) // 2) + " = " + '"' + q6Txt[eachQ6Label] + '"' +"\n")
-else:
-    f.write("p.q6ask = 0" +"\n")                
-
+            f.write("p.cellAmt" + str((eachQ6Label+1) // 2) + " = \"0\" " + "\n")
 #q7 question text pipe
 q7Txt_temp = page_soup.find("tr",{"id":"gv-field-21-64"})
 if q7Txt_temp is not None:
-    q7Txt = (q7Txt_temp.td.ul.text)
-    f.write("p.q7qtext = " + '"' + str(q7Txt) + '"' + "\n")
+    q7Txt = (q7Txt_temp.td.ul)
+    q7List = []
+    for li in q7Txt.findAll('li'):
+        print (li.text)
+        q7List.extend(li)
+    print (q7List)
+    
+    for eachOE in range(len(q7List)):
+        if (eachOE == 0):   
+            f.write("p.q7qtext = " + '"' + str(q7List[0]) + '"' + "\n")
+        if (eachOE == 1):
+            f.write("p.q8qtext = " + '"' + str(q7List[1]) + '"' + "\n")
+        if (eachOE == 2):
+            f.write("p.q9qtext = " + '"' + str(q7List[2]) + '"' + "\n")            
+    if (len(q7List) == 1):
+        f.write("p.q8qtext = \"0\"" + "\n")
+        f.write("p.q9qtext = \"0\"" + "\n")
+    if (len(q7List) == 2):
+        f.write("p.q9qtext = \"0\"" + "\n")            
 else:
     f.write("p.q7qtext = \"0\"" + "\n")
-
-f.write("p.q8qtext = \"0\"" + "\n")
-f.write("p.q9qtext = \"0\"" + "\n")    
+    f.write("p.q8qtext = \"0\"" + "\n")
+    f.write("p.q9qtext = \"0\"" + "\n")
 
 f.close()
